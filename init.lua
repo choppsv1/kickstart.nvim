@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -109,6 +109,8 @@ vim.o.mouse = 'a'
 
 -- Don't show the mode, since it's already in the status line
 vim.o.showmode = false
+
+vim.g.clipboard = 'osc52'
 
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
@@ -200,10 +202,15 @@ vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower win
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
--- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
--- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
--- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
--- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
+-- -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
+-- -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
+-- -- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
+-- -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
+--
+-- chopps: Some emacs equivalents
+vim.keymap.set('n', '<C-x><C-s>', ':w<CR>', { silent = true })
+vim.keymap.set({ 'i', 'o' }, '<C-x><C-s>', '<C-o>:w<CR>', { silent = true })
+vim.keymap.set('n', '<C-x>o', '<C-w><C-w>', { remap = false, silent = true })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -671,7 +678,16 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
+        -- Or with custom configuration:
+        -- ccls = {
+        -- init_options = {
+        -- cache = {
+        -- directory = vim.fn.stdpath 'cache' .. '/ccls',
+        -- },
+        -- compilationDatabaseDirectory = 'build',
+        -- },
+        -- },
+        clangd = {},
         -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
@@ -895,6 +911,16 @@ require('lazy').setup({
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       vim.cmd.colorscheme 'tokyonight-night'
+    end,
+  },
+  {
+    'numToStr/Comment.nvim',
+    opts = {}, -- uses defaults
+    config = function()
+      require('Comment').setup()
+
+      vim.keymap.set('n', 'M-;', require('Comment.api').toggle.linewise.current)
+      vim.keymap.set('v', 'M-;', "<ESC><CMD>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>")
     end,
   },
 
